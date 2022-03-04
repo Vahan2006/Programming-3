@@ -53,7 +53,6 @@ class LivingCreature {
         var newCell = random(emptyCells);
 
         if (newCell && this.energy >= 0) {
-            console.log("dfg")
             var newX = newCell[0];
             var newY = newCell[1];
             matrix[newY][newX] = matrix[this.y][this.x]
