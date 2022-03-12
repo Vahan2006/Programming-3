@@ -3,6 +3,7 @@ class LivingCreature {
         this.x = x
         this.y = y
         this.multiply = 0
+        this.time = 0
         this.directions = [
             [this.x - 1, this.y - 1],
             [this.x, this.y - 1],
@@ -51,7 +52,6 @@ class LivingCreature {
         this.energy--
         var emptyCells = this.chooseCell(0);
         var newCell = random(emptyCells);
-
         if (newCell && this.energy >= 0) {
             var newX = newCell[0];
             var newY = newCell[1];
@@ -59,6 +59,13 @@ class LivingCreature {
             matrix[this.y][this.x] = 0
             this.x = newX
             this.y = newY
+
+            for (var i in matrix) {
+                if (this.x == matrix[i].x && this.y == matrix[i].y) {
+                    matrix.splice(i, 1);
+                    break;
+                }
+            }
         } else {
             if (this.energy < 0) {
                 this.die()
@@ -69,6 +76,7 @@ class LivingCreature {
 
 
 }
+
 class Grass extends LivingCreature {
     mul() {
         this.getNewCoordinates()
@@ -99,15 +107,20 @@ class GrassEater extends LivingCreature {
         this.multiply++;
         var emptyCells = this.chooseCell(0);
         var newCell = random(emptyCells);
-
-        if (newCell && this.multiply >= 15) {
+        
+        if (newCell && this.multiply >= a) {
             var newX = newCell[0];
             var newY = newCell[1];
             matrix[newY][newX] = 2;
-
             var newGr = new GrassEater(newX, newY);
             grassEaterArr.push(newGr);
             this.multiply = 0;
+            for (var i in matrix) {
+                if (this.x == matrix[i].x && this.y == matrix[i].y) {
+                    matrix.splice(i, 1);
+                    break;
+                }
+            }
         }
     }
 
@@ -131,11 +144,13 @@ class GrassEater extends LivingCreature {
             }
 
         } else {
-            this.move()
-
+            
+                this.move()
+            
 
         }
     }
+
     die() {
         matrix[this.y][this.x] = 0
         for (var i in grassEaterArr) {
@@ -146,9 +161,6 @@ class GrassEater extends LivingCreature {
         }
     }
 }
-
-
-
 
 
 class Predator extends LivingCreature {
@@ -206,6 +218,13 @@ class Fermer extends LivingCreature {
             this.y = newY
             var newGrass = new Grass(newX, newY);
             grassArr.push(newGrass);
+
+            for (var i in matrix) {
+                if (this.x == matrix[i].x && this.y == matrix[i].y) {
+                    matrix.splice(i, 1);
+                    break;
+                }
+            }
         }
     }
 }
@@ -267,7 +286,9 @@ class Trap extends LivingCreature {
     }
 }
 class Lava extends LivingCreature {
-    mul() {
+
+    mul(a) {
+
         this.multiply++;
         var emptyCells = this.chooseCell(0);
         var newCell = random(emptyCells);
@@ -276,7 +297,7 @@ class Lava extends LivingCreature {
         var emptyCells11 = this.chooseCell(2);
         var newCell11 = random(emptyCells11);
 
-        if (newCell && this.multiply >= 30) {
+        if (newCell && this.multiply >= a) {
             var newX = newCell[0];
             var newY = newCell[1];
             matrix[newY][newX] = 6;
@@ -284,8 +305,10 @@ class Lava extends LivingCreature {
             var lava = new Lava(newX, newY);
             lavaArr.push(lava);
             this.multiply = 0;
+
+
         }
-        if (newCell1 && this.multiply >= 30) {
+        if (newCell1 && this.multiply >= a) {
             var newX = newCell1[0];
             var newY = newCell1[1];
             matrix[newY][newX] = 6;
@@ -293,8 +316,14 @@ class Lava extends LivingCreature {
             var lava = new Lava(newX, newY);
             lavaArr.push(lava);
             this.multiply = 0;
+            for (var i in grassArr) {
+                if (newX == grassArr[i].x && newY == grassArr[i].y) {
+                    grassArr.splice(i, 1);
+                    break;
+                }
+            }
         }
-        if (newCell11 && this.multiply >= 30) {
+        if (newCell11 && this.multiply >= a) {
             var newX = newCell11[0];
             var newY = newCell11[1];
             matrix[newY][newX] = 6;
@@ -302,6 +331,48 @@ class Lava extends LivingCreature {
             var lava = new Lava(newX, newY);
             lavaArr.push(lava);
             this.multiply = 0;
+            for (var i in grassEaterArr) {
+                if (newX == grassEaterArr[i].x && newY == grassEaterArr[i].y) {
+                    grassEaterArr.splice(i, 1);
+                    break;
+                }
+            }
+        }
+    }
+}
+
+
+class GrassVirus extends LivingCreature {
+    mul() {
+        this.multiply++
+        this.getNewCoordinates()
+        var emptyCells = this.chooseCell(1);
+        var newCell = random(emptyCells);
+
+        if (newCell && this.multiply >= 5) {
+            this.multiply = 0
+            var newX = newCell[0];
+            var newY = newCell[1];
+            matrix[newY][newX] = 8;
+
+            var newGrassV = new GrassVirus(newX, newY);
+            grassVirusArr.push(newGrassV);
+
+            for (var i in grassArr) {
+                if (newX == grassArr[i].x && newY == grassArr[i].y) {
+                    grassArr.splice(i, 1);
+                    break;
+                }
+            }
+        }
+    }
+    die() {
+        matrix[this.y][this.x] = 0
+        for (var i in grassVirusArr) {
+            if (this.x == grassVirusArr[i].x && this.y == grassVirusArr[i].y) {
+                grassVirusArr.splice(i, 1);
+                break;
+            }
         }
     }
 }
